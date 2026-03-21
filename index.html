@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Scriptum</title>
+<style>
+:root{
+  --bg:#0b0b0b; --card:#111; --muted:#999; --text:#eaeaea; --accent:#9ca3a8; --select-bg: rgba(255,255,255,0.02);
+  --transition: all 0.3s ease;
+  --shadow: 0 6px 18px rgba(0,0,0,.6);
+  --radius: 12px;
+}
+body{ 
+  background:var(--bg); 
+  color:var(--text); 
+  font-family:'Inter',Arial,Helvetica,sans-serif; 
+  margin:0; 
+  padding:0; 
+  transition: var(--transition);
+}
+.container{ 
+  max-width:900px; 
+  margin:28px auto; 
+  padding:18px; 
+  background:var(--card); 
+  border-radius:var(--radius); 
+  box-shadow:var(--shadow);
+  transition: var(--transition);
+}
+h1{ 
+  margin:0 0 10px 0; 
+  text-align:center;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+.row{ 
+  display:flex; 
+  gap:10px; 
+  align-items:center; 
+}
+input, textarea, select, button{ 
+  border-radius:8px; 
+  border:1px solid rgba(255,255,255,.06); 
+  padding:10px; 
+  color:var(--text); 
+  background: rgba(255,255,255,0.02); 
+  transition: var(--transition);
+  font-family: inherit;
+}
+select#categoryFilter, select#existingCategory, select#themeSelect{ 
+  background: var(--select-bg); 
+  color: var(--text); 
+  -webkit-appearance: none; 
+  appearance: none; 
+}
+select#categoryFilter option, select#existingCategory option, select#themeSelect option{ 
+  background: #222; 
+  color:var(--text); 
+}
+input::placeholder, textarea::placeholder{ 
+  color:var(--muted); 
+}
+input:focus, textarea:focus, select:focus{ 
+  background: rgba(255,255,255,0.05); 
+  border-color: var(--accent); 
+  box-shadow:0 0 10px var(--accent); 
+  outline:none; 
+}
+textarea{ 
+  min-height:80px; 
+  resize:vertical; 
+  width:100%; 
+}
+button{ 
+  cursor:pointer; 
+  background:var(--accent); 
+  color:#111; 
+  border:none; 
+  transition: var(--transition);
+  font-weight: 500;
+}
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.actions{ 
+  display:flex; 
+  gap:8px; 
+  flex-wrap:wrap; 
+}
+.entries{ 
+  margin-top:14px; 
+  background: rgba(255,255,255,0.02); 
+  padding:12px; 
+  border-radius:8px; 
+}
+.entry{ 
+  padding:12px; 
+  border-radius:8px; 
+  margin-bottom:10px; 
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  transition: var(--transition);
+  position: relative;
+  cursor: pointer;
+}
+.entry:hover {
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.04));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.entry .meta{ 
+  font-size:0.85rem; 
+  color:var(--muted); 
+  display:flex; 
+  justify-content:space-between; 
+  align-items:center; 
+}
+.small{ 
+  font-size:0.9rem; 
+  color:var(--muted); 
+}
+.controls{ 
+  display:flex; 
+  gap:10px; 
+  align-items:center; 
+  flex-wrap:wrap; 
+  margin-top:10px; 
+}
+.filters{ 
+  display:flex; 
+  gap:8px; 
+  align-items:center; 
+}
+.search-panel{ 
+  background:rgba(255,255,255,0.05); 
+  padding:12px; 
+  border-radius:var(--radius); 
+  margin-top:12px; 
+  display:flex; 
+  flex-wrap:wrap; 
+  gap:10px; 
+  align-items:center; 
+  justify-content:space-between; 
+}
+.badge{ 
+  padding:6px 8px; 
+  border-radius:6px; 
+  background:#222; 
+  color:var(--muted); 
+  font-size:0.85rem; 
+  display: inline-block;
+}
+.top-right{ 
+  display:flex; 
+  gap:8px; 
+  align-items:center; 
+}
+.danger{ 
+  background:#8b1d1d; 
+  color:#fff; 
+}
+.important{ 
+  border:2px solid #ffd54f; 
+}
+.archived{ 
+  opacity:.55; 
+}
+.panel{ 
+  margin-top:12px; 
+  padding:12px; 
+  background:rgba(255,255,255,0.02); 
+  border-radius:10px; 
+  transition: var(--transition);
+}
+.hidden{ 
+  display:none; 
+}
+canvas{ 
+  max-width:100%; 
+  height:160px; 
+}
+footer{ 
+  text-align:center; 
+  color:var(--muted); 
+  font-size:0.85rem; 
+  margin-top:10px; 
+}
+
+/* Selector dentro del modal de edición */
+#editCategorySelect {
+    background: var(--select-bg);
+    color: var(--text);
+    -webkit-appearance: none;
+    appearance: none;
+    padding:8px;
+    border-radius:6px;
+    border:1px solid rgba(255,255,255,0.1);
+}
+
+#editCategorySelect option {
+    background: #222;
+    color: var(--text);
+}
+
+/* Themes base */
+.theme-black{--bg:#0b0b0b; --card:#111; --text:#eaeaea; --accent:#9ca3a8; --select-bg: rgba(255,255,255,0.02);}
+.theme-gray{--bg:#141414; --card:#1b1b1b; --text:#e8e8e8; --accent:#b0b0b0; --select-bg: rgba(255,255,255,0.02);}
+.theme-green{--bg:#0b2e2e; --card:#104040; --text:#e0f2f1; --accent:#4db6ac; --select-bg: rgba(255,255,255,0.02);}
+.theme-purple{--bg:#1b0b1b; --card:#331133; --text:#e8d4f2; --accent:#9c27b0; --select-bg: rgba(255,255,255,0.02);}
+.theme-turquoise{--bg:#0b1b1b; --card:#0f3333; --text:#e0f7f7; --accent:#26a69a; --select-bg: rgba(255,255,255,0.02);}
+
+/* responsive */
+@media(max-width:720px){ 
+  .row{ flex-direction:column; } 
+  .filters{ flex-direction:column; align-items:stretch; } 
+  .entry .meta { flex-direction: column; align-items: flex-start; gap: 5px; }
+  .search-panel { flex-direction: column; align-items: stretch; }
+  .advanced-search-fields { grid-template-columns: 1fr !important; }
+}
+
+/* Modal para editar nota */
+#editModal{ 
+  position:fixed; 
+  top:0; 
+  left:0; 
+  width:100%; 
+  height:100%; 
+  background:rgba(0,0,0,0.7); 
+  display:none; 
+  justify-content:center; 
+  align-items:center; 
+  z-index:9999; 
+}
+#editModalContent{ 
+  background:var(--card); 
+  padding:20px; 
+  border-radius:var(--radius); 
+  width:90%; 
+  max-width:500px; 
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+#editModalContent textarea, #editModalContent select, #editModalContent input{ 
+  width:100%; 
+  margin-bottom:10px; 
+  padding:8px; 
+  border-radius:6px; 
+  border:1px solid rgba(255,255,255,0.1); 
+  background: rgba(255,255,255,0.02); 
+  color:var(--text); 
+}
+#editModalContent button{ 
+  margin-right:8px; 
+}
+
+/* Selects de Prioridad y Estatus dentro de cada nota */
+.controls select {
+    background: var(--select-bg);
+    color: var(--text);
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.controls select option {
+    background: #222;
+    color: var(--text);
+}
+
+#logoContainer {
+  text-align: center;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+#logo {
+  width: 80px;
+  height: auto;
+  filter: drop-shadow(0 0 5px rgba(255,255,255,0.1));
+}
+
+/* Nuevos estilos para mejoras */
+
+/* Estadísticas */
+.stats-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  background: rgba(255,255,255,0.05);
+  transform: translateY(-3px);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Etiquetas */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.tag {
+  background: rgba(255,255,255,0.1);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tag-remove {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Favoritos */
+.favorite-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0;
+  margin-right: 5px;
+}
+
+.favorite-btn.active {
+  color: #ffd54f;
+}
+
+/* Búsqueda avanzada */
+.advanced-search {
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.advanced-search.hidden {
+  display: none;
+}
+
+.advanced-search-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+/* Recordatorios */
+.reminder-badge {
+  background: #ff9800;
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  margin-left: 5px;
+}
+
+.reminder-active {
+  border: 2px solid #ff9800;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { border-color: #ff9800; }
+  50% { border-color: #ff5722; }
+  100% { border-color: #ff9800; }
+}
+
+/* Navegación entre notas */
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.nav-btn {
+  background: rgba(255,255,255,0.05);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* Vista previa rápida */
+.quick-preview {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--card);
+  border-radius: 8px;
+  padding: 15px;
+  max-width: 300px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: var(--transition);
+  transform: translateY(100px);
+  opacity: 0;
+}
+
+.quick-preview.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.quick-preview-content {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Indicadores visuales */
+.priority-high { border-left: 3px solid #f44336; }
+.priority-medium { border-left: 3px solid #ff9800; }
+.priority-low { border-left: 3px solid #4caf50; }
+
+.status-complete { border-right: 3px solid #4caf50; }
+.status-in-progress { border-right: 3px solid #2196f3; }
+.status-paused { border-right: 3px solid #ff9800; }
+.status-issue { border-right: 3px solid #f44336; }
+
+/* Pestañas */
+.tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+.tab { padding: 10px 15px; cursor: pointer; border-bottom: 2px solid transparent; transition: var(--transition); }
+.tab.active { border-bottom: 2px solid var(--accent); color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.3s ease forwards; }
+
+/* Mejoras de accesibilidad */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Scroll personalizado */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+/* Formularios mejorados */
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--muted); }
+.form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.form-row .form-group { flex: 1; margin-bottom: 0; }
+
+/* Botones de acción */
+.action-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px; }
+
+/* Mejoras para campos de entrada */
+.input-with-icon { position: relative; }
+.input-with-icon input { padding-left: 35px; width: 100%; }
+.input-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+
+/* Gráficos */
+.chart-container { position: relative; height: 200px; width: 100%; }
+
+/* CORRECCIONES ESPECÍFICAS PARA LOS PROBLEMAS MENCIONADOS */
+
+/* 1. Mejorar alineación del checkbox de favoritos */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  justify-content: flex-start;
+  width: fit-content;
+}
+.checkbox-container input[type="checkbox"] {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.checkbox-container label {
+  margin: 0;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+/* 2. Mejorar visibilidad de los selects en búsqueda avanzada */
+#advancedSearch select,
+#statusFilter,
+#priorityFilter,
+#favoriteFilter,
+#advancedSearchCategory,
+#advancedSearchStatus,
+#advancedSearchPriority,
+#advancedSearchFavorite,
+#advancedSearchReminder {
+  background: #1a1a1a !important;
+  color: #eaeaea !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  padding: 8px;
+  border-radius: 6px;
+  width: 100%;
+}
+#advancedSearch select option,
+#statusFilter option,
+#priorityFilter option,
+#favoriteFilter option,
+#advancedSearchCategory option,
+#advancedSearchStatus option,
+#advancedSearchPriority option,
+#advancedSearchFavorite option,
+#advancedSearchReminder option {
+  background: #1a1a1a !important;
+  color: #eaeaea !important;
+}
+
+/* 3. Asegurar que los selects en búsqueda avanzada no se encimen */
+.advanced-search-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 10px;
+}
+.advanced-search .form-group {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.advanced-search .form-group label {
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.advanced-search .form-group select,
+.advanced-search .form-group input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Logo de Control Interno - Dorado Oscuro Elegante (EXCLUSIVO) */
+#logoControlInternoLogin,
+#logoControlInternoApp {
+    filter: brightness(0) saturate(100%) invert(51%) sepia(56%) saturate(340%) hue-rotate(5deg) brightness(88%) contrast(86%);
+    max-width: 240px;
+    height: auto;
+    transition: var(--transition);
+    opacity: 0.95;
+}
+#logoControlInternoLogin:hover,
+#logoControlInternoApp:hover {
+    transform: scale(1.05);
+    opacity: 1;
+}
+
+/* El logo CSW se mantiene con sus colores originales */
+#logo {
+    max-width: 180px;
+    height: auto;
+    transition: var(--transition);
+    /* Sin filter para mantener colores originales */
+}
+#logo:hover { transform: scale(1.05); }
+
+/* Ajuste del contenedor de logos en ambas vistas */
+#loginView, #diaryView { position: relative; }
+#loginView h1, #diaryView h1 { margin-top: 5px; margin-bottom: 5px; }
+
+/* ============================
+   BOTÓN FLOTANTE FULLSCREEN
+   (arriba, sin scroll)
+   ============================ */
+.fullscreen-fab{
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 10000;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.fullscreen-fab:hover{
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.12);
+}
+</style>
+</head>
+
+<body class="theme-black">
+
+<!-- BOTÓN FULLSCREEN (siempre visible arriba a la derecha) -->
+<button id="fullscreenBtn" class="fullscreen-fab" title="Pantalla completa" aria-label="Pantalla completa">
+  <span id="fullscreenIcon">⛶</span>
+</button>
+
+<div class="container" id="app">
+<!-- Login -->
+<div id="loginView" style="text-align:center">
+    <!-- Logo de Control Interno arriba - DORADO EXCLUSIVO -->
+    <div style="text-align: center; margin-bottom: 15px;">
+        <img src="https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20Control%20Interno.png" 
+             alt="Logo Control Interno" 
+             id="logoControlInternoLogin"
+             style="max-width: 120px; height: auto;">
+    </div>
+    
+    <h1>Scriptum</h1>
+
+    <!-- Logo CSW debajo (se mantiene original) -->
+    <div id="logoContainer">
+       <img src="https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20CSW.png" alt="Logo Scriptum" id="logo">
+    </div>
+
+    <div style="max-width:420px;margin:0 auto">
+      <input id="pwInput" type="password" placeholder="Ingresa la contraseña" />
+      <div style="margin-top:8px"><button id="loginBtn" style="width:100%;">Entrar</button></div>
+      <p id="loginMsg" class="small" style="color:#f66"></p>
+    </div>
+</div>
+
+  <!-- Diario -->
+<div id="diaryView" class="hidden">
+    <!-- Logo de Control Interno arriba - DORADO EXCLUSIVO -->
+    <div style="text-align: center; margin-bottom: 15px;">
+        <img src="https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20Control%20Interno.png" 
+             alt="Logo Control Interno" 
+             id="logoControlInternoApp"
+             style="max-width: 120px; height: auto;">
+    </div>
+    
+    <h1>Scriptum</h1>
+
+    <!-- Logo CSW debajo (se mantiene original) -->
+    <div id="logoContainer">
+       <img src="https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20CSW.png" alt="Logo Scriptum" id="logo">
+    </div>
+
+    <!-- Contenido de pestañas -->
+    <div class="tab-content active" id="notes-tab">
+      <div class="panel">
+        <textarea id="noteText" placeholder="Escribe tu nota..."></textarea>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <input id="noteCategory" placeholder="Escribe categoría..." />
+          </div>
+          <div class="form-group">
+            <select id="existingCategory"><option value="">Selecciona categoría existente</option></select>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <input id="noteTags" placeholder="Etiquetas (separadas por coma)" />
+          </div>
+          <div class="form-group">
+            <input id="noteReminder" type="datetime-local" />
+          </div>
+        </div>
+        
+        <div class="checkbox-container">
+          <input type="checkbox" id="noteFavorite" />
+          <label for="noteFavorite">Marcar como favorita</label>
+        </div>
+        
+        <div class="actions"><button id="addBtn">Agregar Nota</button></div>
+      </div>
+
+      <div class="search-panel">
+        <input id="searchInput" placeholder="Buscar por palabra..." style="flex:1" />
+        <select id="categoryFilter"><option value="">Todas las categorías</option></select>
+        <button id="toggleAdvancedSearch">Búsqueda Avanzada</button>
+        <button id="clearFilters">Limpiar filtros</button>
+      </div>
+
+      <!-- Búsqueda avanzada -->
+      <div id="advancedSearch" class="advanced-search hidden">
+        <h3 style="margin-top:0">Filtros Avanzados</h3>
+        <div class="advanced-search-fields">
+          <div class="form-group">
+            <label>Estado</label>
+            <select id="statusFilter">
+              <option value="">Cualquier estado</option>
+              <option value="No iniciado">No iniciado</option>
+              <option value="En curso">En curso</option>
+              <option value="En pausa">En pausa</option>
+              <option value="Con incidencia">Con incidencia</option>
+              <option value="Completo">Completo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Prioridad</label>
+            <select id="priorityFilter">
+              <option value="">Cualquier prioridad</option>
+              <option value="Alta">Alta</option>
+              <option value="Media">Media</option>
+              <option value="Baja">Baja</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Favoritas</label>
+            <select id="favoriteFilter">
+              <option value="">Todas</option>
+              <option value="favorites">Solo favoritas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Fecha desde</label>
+            <input type="date" id="dateFromFilter" />
+          </div>
+          <div class="form-group">
+            <label>Fecha hasta</label>
+            <input type="date" id="dateToFilter" />
+          </div>
+        </div>
+        <button id="applyAdvancedFilters">Aplicar Filtros</button>
+      </div>
+
+      <div class="panel" style="margin-top:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong>Registros Pendientes</strong>
+          <div>
+            <button id="togglePendingBtn">Ocultar Pendientes</button>
+            <button id="toggleCompletedBtn">Ocultar Completos</button>
+          </div>
+        </div>
+        <div id="entries" class="entries"></div>
+      </div>
+
+      <!-- Sección de registros completos -->
+      <div class="panel" style="margin-top:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong>Registros Completos</strong>
+        </div>
+        <div id="completedEntries" class="entries"></div>
+      </div>
+
+      <div class="action-buttons">
+        <button id="selectBtn">Seleccionar</button>
+        <button id="cancelSelectBtn" class="hidden">Cancelar Selección</button>
+        <button id="shareWhatsBtn" class="hidden">WhatsApp</button>
+        <button id="shareEmailBtn" class="hidden">Email</button>
+        <button id="shareWordBtn" class="hidden">Word</button>
+        <button id="selectAllBtn" class="hidden">Seleccionar todo</button>
+      </div>
+
+      <div class="action-buttons">
+        <button id="exportJsonBtn" style="background:#1e40af;color:#fff;">Exportar JSON</button>
+        <button id="importJsonBtn" style="background:#1e40af;color:#fff;">Importar JSON</button>
+        <input type="file" id="importFileInput" accept=".json" class="hidden"/>
+      </div>
+    </div>
+
+    <!-- Pestaña de estadísticas -->
+    <div class="tab-content" id="stats-tab">
+      <div class="stats-panel">
+        <div class="stat-card">
+          <div class="stat-value" id="totalNotes">0</div>
+          <div class="stat-label">Total Notas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="completedNotes">0</div>
+          <div class="stat-label">Completadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="favoriteNotes">0</div>
+          <div class="stat-label">Favoritas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="highPriorityNotes">0</div>
+          <div class="stat-label">Alta Prioridad</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="pendingNotes">0</div>
+          <div class="stat-label">Pendientes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="withReminderNotes">0</div>
+          <div class="stat-label">Con Recordatorio</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="activeReminders">0</div>
+          <div class="stat-label">Recordatorios Activos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="categoriesCount">0</div>
+          <div class="stat-label">Categorías</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pestaña de búsqueda avanzada -->
+    <div class="tab-content" id="search-tab">
+      <div class="panel">
+        <h3>Búsqueda Avanzada</h3>
+        <div class="advanced-search-fields">
+          <div class="form-group">
+            <label>Texto</label>
+            <input id="advancedSearchText" placeholder="Texto a buscar..." />
+          </div>
+          <div class="form-group">
+            <label>Categoría</label>
+            <select id="advancedSearchCategory">
+              <option value="">Cualquier categoría</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Estado</label>
+            <select id="advancedSearchStatus">
+              <option value="">Cualquier estado</option>
+              <option value="No iniciado">No iniciado</option>
+              <option value="En curso">En curso</option>
+              <option value="En pausa">En pausa</option>
+              <option value="Con incidencia">Con incidencia</option>
+              <option value="Completo">Completo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Prioridad</label>
+            <select id="advancedSearchPriority">
+              <option value="">Cualquier prioridad</option>
+              <option value="Alta">Alta</option>
+              <option value="Media">Media</option>
+              <option value="Baja">Baja</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Etiquetas</label>
+            <input id="advancedSearchTags" placeholder="Etiquetas (separadas por coma)" />
+          </div>
+          <div class="form-group">
+            <label>Fecha desde</label>
+            <input type="date" id="advancedSearchDateFrom" />
+          </div>
+          <div class="form-group">
+            <label>Fecha hasta</label>
+            <input type="date" id="advancedSearchDateTo" />
+          </div>
+          <div class="form-group">
+            <label>Favoritas</label>
+            <select id="advancedSearchFavorite">
+              <option value="">Todas</option>
+              <option value="true">Solo favoritas</option>
+              <option value="false">No favoritas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Con recordatorio</label>
+            <select id="advancedSearchReminder">
+              <option value="">Todas</option>
+              <option value="true">Con recordatorio</option>
+              <option value="false">Sin recordatorio</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button id="performAdvancedSearch">Buscar</button>
+          <button id="clearAdvancedFilters" style="background: #6b7280;">Limpiar Filtros</button>
+        </div>
+      </div>
+      
+      <div id="advancedSearchResults" class="entries"></div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; margin-top:20px; align-items:flex-end;">
+      <div>
+        <select id="themeSelect">
+          <option value="black">Negro</option>
+          <option value="gray">Gris</option>
+          <option value="green">Verde</option>
+          <option value="purple">Morado</option>
+          <option value="turquoise">Turquesa</option>
+        </select>
+      </div>
+      <button id="logoutBtn" class="danger">Cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar -->
+<div id="editModal">
+  <div id="editModalContent">
+    <h3 style="margin-top:0">Editar Nota</h3>
+    <textarea id="editTextArea"></textarea>
+    <div class="form-group">
+      <select id="editCategorySelect"></select>
+    </div>
+    <div class="form-group">
+      <input id="editTags" placeholder="Etiquetas (separadas por coma)" />
+    </div>
+    <div class="form-group">
+      <input id="editReminder" type="datetime-local" />
+    </div>
+    <div class="checkbox-container">
+      <input type="checkbox" id="editFavorite" />
+      <label for="editFavorite">Marcar como favorita</label>
+    </div>
+    <div style="margin-top:10px">
+      <button id="saveEditBtn">Guardar</button>
+      <button id="cancelEditBtn">Cancelar</button>
+      <button id="deleteEditBtn" class="danger">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================
+   FULLSCREEN API (botón arriba)
+   ============================ */
+(function initFullscreen(){
+  const btn = document.getElementById('fullscreenBtn');
+  const icon = document.getElementById('fullscreenIcon');
+  if (!btn || !icon) return;
+
+  const docEl = document.documentElement;
+  const canEnter = !!(docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen);
+  const canExit  = !!(document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen);
+
+  // Si el navegador no soporta fullscreen, ocultar el botón.
+  if (!canEnter || !canExit) {
+    btn.style.display = 'none';
+    return;
+  }
+
+  function isFullscreen(){
+    return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+  }
+
+  async function enterFullscreen(){
+    try{
+      if (docEl.requestFullscreen) await docEl.requestFullscreen();
+      else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+      else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
+    }catch(e){}
+  }
+
+  async function exitFullscreen(){
+    try{
+      if (document.exitFullscreen) await document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    }catch(e){}
+  }
+
+  function syncUI(){
+    const fs = isFullscreen();
+    icon.textContent = fs ? '⤫' : '⛶';
+    btn.title = fs ? 'Salir de pantalla completa' : 'Pantalla completa';
+    btn.setAttribute('aria-label', btn.title);
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (isFullscreen()) exitFullscreen();
+    else enterFullscreen();
+  });
+
+  document.addEventListener('fullscreenchange', syncUI);
+  document.addEventListener('webkitfullscreenchange', syncUI);
+  document.addEventListener('msfullscreenchange', syncUI);
+
+  syncUI();
+})();
+
+// Constantes y variables globales
+const LS_ENTRIES='blackNote_entries';
+const passwordCorrecta = "ControlInterno2026"; 
+let SESSION={password:null, unlocked:false};
+let selecting=false;
+let selectedEntries=[];
+let pendingHidden=false;
+let completedHidden=false;
+
+// Guardar sesión en localStorage
+function saveSession() {
+  localStorage.setItem('scriptum_session', JSON.stringify(SESSION));
+}
+
+// Cargar sesión desde localStorage
+function loadSession() {
+  const data = localStorage.getItem('scriptum_session');
+  if (data) {
+    SESSION = JSON.parse(data);
+    if (SESSION.unlocked) {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('diaryView').classList.remove('hidden');
+      refreshEntriesUI();
+      updateStats();
+    }
+  }
+}
+
+// Ejecutar al cargar la página
+loadSession();
+
+// Funciones de utilidad
+function getStoredEntries(){
+  const entries = localStorage.getItem(LS_ENTRIES);
+  return entries ? JSON.parse(entries) : [];
+}
+
+function setStoredEntries(entries){
+  localStorage.setItem(LS_ENTRIES, JSON.stringify(entries));
+}
+
+function uid(){
+  return Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9);
+}
+
+function nowStr(){
+  return new Date().toLocaleString();
+}
+
+/* LOGIN */
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+  const pw = document.getElementById('pwInput').value.trim();
+  if(pw === passwordCorrecta){
+    SESSION.password = pw;
+    SESSION.unlocked = true;
+    saveSession();
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('diaryView').classList.remove('hidden');
+    refreshEntriesUI();
+    updateStats();
+  } else {
+    document.getElementById('loginMsg').textContent = 'Contraseña incorrecta';
+  }
+});
+
+document.getElementById('pwInput').addEventListener('keypress', e => {
+  if(e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+/* LOGOUT */
+document.getElementById('logoutBtn').addEventListener('click',()=>{
+  SESSION={password:null, unlocked:false};
+  saveSession();
+  document.getElementById('diaryView').classList.add('hidden');
+  document.getElementById('loginView').classList.remove('hidden');
+  document.getElementById('pwInput').value='';
+});
+
+/* THEMES */
+document.getElementById('themeSelect').addEventListener('change',e=>{
+  document.body.className='theme-'+e.target.value;
+});
+
+/* ADD NOTE */
+document.getElementById('addBtn').addEventListener('click',()=>{
+  const text=document.getElementById('noteText').value.trim();
+  let category=document.getElementById('noteCategory').value.trim();
+  const existing=document.getElementById('existingCategory').value;
+  if(!category && existing) category=existing;
+  if(!text) return alert('Agrega una nota');
+  if(!category) return alert('Selecciona o escribe una categoría');
+  
+  // Obtener etiquetas
+  const tagsInput = document.getElementById('noteTags').value.trim();
+  const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+  
+  // Obtener recordatorio
+  const reminderInput = document.getElementById('noteReminder').value;
+  const reminder = reminderInput ? new Date(reminderInput).getTime() : null;
+  
+  // Obtener favorito
+  const favorite = document.getElementById('noteFavorite').checked;
+  
+  const entries=getStoredEntries();
+  entries.push({
+    id:uid(), 
+    text, 
+    category, 
+    date:nowStr(), 
+    status:'No iniciado', 
+    priority:'',
+    tags: tags,
+    reminder: reminder,
+    favorite: favorite,
+    reminderNotified: false
+  });
+  setStoredEntries(entries);
+  document.getElementById('noteText').value='';
+  document.getElementById('noteCategory').value='';
+  document.getElementById('existingCategory').value='';
+  document.getElementById('noteTags').value='';
+  document.getElementById('noteReminder').value='';
+  document.getElementById('noteFavorite').checked = false;
+  refreshEntriesUI();
+  updateStats();
+});
+
+/* EDIT MODAL */
+const editModal=document.getElementById('editModal');
+const editTextArea=document.getElementById('editTextArea');
+const editCategorySelect=document.getElementById('editCategorySelect');
+let currentEditId=null;
+
+function openEditModal(id,text,category,tags,reminder,favorite){
+  currentEditId=id;
+  editTextArea.value=text;
+  
+  // Cargar categorías existentes
+  const entries=getStoredEntries();
+  const cats=[...new Set(entries.map(e=>e.category).filter(Boolean))];
+  editCategorySelect.innerHTML='';
+  cats.forEach(c=>{ 
+    const opt=document.createElement('option'); 
+    opt.value=c; opt.textContent=c; 
+    editCategorySelect.appendChild(opt); 
+  });
+  const customOpt=document.createElement('option'); 
+  customOpt.value='__custom__'; customOpt.textContent='Nueva categoría...'; 
+  editCategorySelect.appendChild(customOpt);
+  editCategorySelect.value=category;
+  
+  // Cargar etiquetas
+  document.getElementById('editTags').value = tags ? tags.join(', ') : '';
+  
+  // Cargar recordatorio
+  if (reminder) {
+    const reminderDate = new Date(reminder);
+    document.getElementById('editReminder').value = reminderDate.toISOString().slice(0, 16);
+  } else {
+    document.getElementById('editReminder').value = '';
+  }
+  
+  // Cargar favorito
+  document.getElementById('editFavorite').checked = favorite || false;
+  
+  editModal.style.display='flex';
+}
+
+document.getElementById('editCategorySelect').addEventListener('change', e=>{
+  if(e.target.value==='__custom__'){
+    const newCat = prompt('Ingresa nueva categoría:');
+    if(newCat && newCat.trim() !== ''){
+      const tempOpt = document.createElement('option');
+      tempOpt.value = newCat.trim();
+      tempOpt.textContent = newCat.trim();
+      editCategorySelect.appendChild(tempOpt);
+      editCategorySelect.value = newCat.trim();
+    } else {
+      editCategorySelect.value = '';
+    }
+  }
+});
+
+document.getElementById('cancelEditBtn').addEventListener('click',()=>{ 
+  editModal.style.display='none'; 
+});
+
+document.getElementById('saveEditBtn').addEventListener('click',()=>{
+  if(!currentEditId) return;
+  const entries=getStoredEntries();
+  const idx=entries.findIndex(e=>e.id===currentEditId);
+  if(idx>=0){
+    entries[idx].text=editTextArea.value;
+    entries[idx].category=editCategorySelect.value;
+    
+    // Guardar etiquetas
+    const tagsInput = document.getElementById('editTags').value.trim();
+    entries[idx].tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+    
+    // Guardar recordatorio
+    const reminderInput = document.getElementById('editReminder').value;
+    entries[idx].reminder = reminderInput ? new Date(reminderInput).getTime() : null;
+    
+    // Guardar favorito
+    entries[idx].favorite = document.getElementById('editFavorite').checked;
+    
+    // Reiniciar notificación de recordatorio si se cambia la fecha
+    if (reminderInput) {
+      entries[idx].reminderNotified = false;
+    }
+    
+    setStoredEntries(entries);
+    refreshEntriesUI();
+    updateStats();
+  }
+  editModal.style.display='none';
+});
+
+document.getElementById('deleteEditBtn').addEventListener('click',()=>{
+  if(!currentEditId) return;
+  if(confirm('¿Estás seguro de que quieres eliminar esta nota?')) {
+    const entries=getStoredEntries();
+    const filteredEntries = entries.filter(e=>e.id!==currentEditId);
+    setStoredEntries(filteredEntries);
+    refreshEntriesUI();
+    updateStats();
+    editModal.style.display='none';
+  }
+});
+
+/* REFRESH ENTRIES */
+function refreshEntriesUI(){
+  const container=document.getElementById('entries');
+  const completedContainer = document.getElementById('completedEntries');
+  let entries=getStoredEntries();
+
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const categoryFilter=document.getElementById('categoryFilter').value;
+
+  container.innerHTML='';
+  completedContainer.innerHTML='';
+
+  const cats=[...new Set(entries.map(e=>e.category).filter(Boolean))];
+  const catFilter=document.getElementById('categoryFilter');
+  const existingCat=document.getElementById('existingCategory');
+
+  const previousSelection = categoryFilter || '';
+  catFilter.innerHTML='<option value="">Todas las categorías</option>';
+  existingCat.innerHTML='<option value="">Selecciona categoría existente</option>';
+  cats.forEach(c=>{
+    const opt1=document.createElement('option'); opt1.value=c; opt1.textContent=c; 
+    if(c===previousSelection) opt1.selected=true; 
+    catFilter.appendChild(opt1);
+
+    const opt2=document.createElement('option'); opt2.value=c; opt2.textContent=c;
+    existingCat.appendChild(opt2);
+  });
+
+  // Filtrar según búsqueda y categoría
+  let filtered = entries.filter(e=>{
+    const matchesSearch=e.text.toLowerCase().includes(search) || (e.category||'').toLowerCase().includes(search);
+    const matchesCategory=!categoryFilter || e.category===categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Separar completados y no completados
+  const activeEntries = filtered.filter(e=>e.status!=='Completo');
+  const completedEntries = filtered.filter(e=>e.status==='Completo');
+
+  // Función de orden por prioridad
+  const priorityOrder = { 'Alta':1, 'Media':2, 'Baja':3, '':4 };
+  activeEntries.sort((a,b)=>priorityOrder[a.priority||''] - priorityOrder[b.priority||'']);
+  completedEntries.sort((a,b)=>priorityOrder[a.priority||''] - priorityOrder[b.priority||'']);
+
+  // Asignar números correlativos por sección
+  activeEntries.forEach((e, idx)=>{ e.numero = idx+1; });
+  completedEntries.forEach((e, idx)=>{ e.numero = idx+1; });
+
+  // Función para renderizar entradas
+  function renderEntries(list, containerTarget){
+    list.forEach(e=>{
+      const div=document.createElement('div'); 
+      div.className='entry fade-in';
+      
+      // Añadir clases según prioridad y estado
+      if (e.priority === 'Alta') div.classList.add('priority-high');
+      else if (e.priority === 'Media') div.classList.add('priority-medium');
+      else if (e.priority === 'Baja') div.classList.add('priority-low');
+      
+      if (e.status === 'Completo') div.classList.add('status-complete');
+      else if (e.status === 'En curso') div.classList.add('status-in-progress');
+      else if (e.status === 'En pausa') div.classList.add('status-paused');
+      else if (e.status === 'Con incidencia') div.classList.add('status-issue');
+      
+      // Verificar si el recordatorio está activo
+      const now = new Date().getTime();
+      if (e.reminder && e.reminder <= now && !e.reminderNotified) {
+        div.classList.add('reminder-active');
+      }
+      
+      const checked=selectedEntries.includes(e.id)?'checked':'';
+      const displayClass = selecting ? '' : 'hidden';
+      
+      // Formatear fecha del recordatorio si existe
+      let reminderBadge = '';
+      if (e.reminder) {
+        const reminderDate = new Date(e.reminder);
+        const now = new Date();
+        if (reminderDate > now) {
+          reminderBadge = `<span class="reminder-badge">Recordatorio: ${reminderDate.toLocaleString()}</span>`;
+        } else if (!e.reminderNotified) {
+          reminderBadge = `<span class="reminder-badge" style="background:#f44336;color:white;">¡Recordatorio activo!</span>`;
+        }
+      }
+      
+      // Mostrar etiquetas si existen
+      let tagsHTML = '';
+      if (e.tags && e.tags.length > 0) {
+        tagsHTML = `<div class="tags-container">`;
+        e.tags.forEach(tag => {
+          tagsHTML += `<span class="tag">${tag}<span class="tag-remove" onclick="removeTag('${e.id}', '${tag}')">×</span></span>`;
+        });
+        tagsHTML += `</div>`;
+      }
+      
+      div.innerHTML=`
+        <div>
+          <input type="checkbox" data-id="${e.id}" ${checked} class="${displayClass}"/>
+          <button class="favorite-btn ${e.favorite ? 'active' : ''}" onclick="toggleFavorite('${e.id}')">★</button>
+          <strong>${e.numero}.</strong> ${e.text.replace(/\n/g,'<br>')} ${reminderBadge}
+        </div>
+        <div class="meta">
+          <span>${e.category}</span>
+          <span>${e.date}</span>
+        </div>
+        ${tagsHTML}
+        <div class="controls">
+          <select onchange="updatePriority('${e.id}', this.value)">
+            <option value="">Prioridad</option>
+            <option value="Alta" ${e.priority==='Alta'?'selected':''}>Alta</option>
+            <option value="Media" ${e.priority==='Media'?'selected':''}>Media</option>
+            <option value="Baja" ${e.priority==='Baja'?'selected':''}>Baja</option>
+          </select>
+          <select onchange="updateStatus('${e.id}', this.value)">
+            <option value="">Estatus</option>
+            <option value="No iniciado" ${e.status==='No iniciado'?'selected':''}>No iniciado</option>
+            <option value="En curso" ${e.status==='En curso'?'selected':''}>En curso</option>
+            <option value="En pausa" ${e.status==='En pausa'?'selected':''}>En pausa</option>
+            <option value="Con incidencia" ${e.status==='Con incidencia'?'selected':''}>Con incidencia</option>
+            <option value="Completo" ${e.status==='Completo'?'selected':''}>Completo</option>
+          </select>
+        </div>`;
+      
+      // Agregar evento de doble clic para abrir modal de edición
+      div.addEventListener('dblclick', () => {
+        openEditModal(e.id, e.text, e.category, e.tags, e.reminder, e.favorite);
+      });
+      
+      containerTarget.appendChild(div);
+    });
+  }
+
+  renderEntries(activeEntries, container);
+  renderEntries(completedEntries, completedContainer);
+
+  // Checkbox events
+  document.querySelectorAll('#entries input[type=checkbox], #completedEntries input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', e=>{
+      const id=e.target.getAttribute('data-id');
+      if(e.target.checked){ 
+        if(!selectedEntries.includes(id)) selectedEntries.push(id);
+      } else {
+        selectedEntries=selectedEntries.filter(x=>x!==id);
+      }
+      toggleShareButtons();
+    });
+  });
+
+  // Ocultar secciones según corresponda
+  if(pendingHidden) container.classList.add('hidden');
+  else container.classList.remove('hidden');
+  
+  if(completedHidden) completedContainer.classList.add('hidden');
+  else completedContainer.classList.remove('hidden');
+
+  toggleShareButtons();
+}
+
+/* SEARCH & FILTER */
+document.getElementById('searchInput').addEventListener('input', refreshEntriesUI);
+document.getElementById('categoryFilter').addEventListener('change', refreshEntriesUI);
+document.getElementById('clearFilters').addEventListener('click',()=>{
+  document.getElementById('searchInput').value=''; 
+  document.getElementById('categoryFilter').value=''; 
+  refreshEntriesUI(); 
+});
+
+/* EXPORT / IMPORT */
+document.getElementById('exportJsonBtn').addEventListener('click', async () => {
+  try {
+    const data = JSON.stringify(getStoredEntries(), null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    
+    // Crear nombre de archivo con fecha actual
+    const now = new Date();
+    const formattedDate = now.toISOString().split('T')[0];
+    const defaultFilename = `Scriptum_respaldo_(${formattedDate}).json`;
+
+    // Método moderno: usar File System Access API si está disponible
+    if ('showSaveFilePicker' in window) {
+      try {
+        const options = {
+          suggestedName: defaultFilename,
+          types: [
+            {
+              description: 'Archivos JSON',
+              accept: { 'application/json': ['.json'] },
+            },
+          ],
+        };
+        
+        const fileHandle = await window.showSaveFilePicker(options);
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        
+        alert('Datos exportados correctamente');
+        return;
+      } catch (err) {
+        // Si el usuario cancela el diálogo, no hacer nada
+        if (err.name === 'AbortError') {
+          console.log('Exportación cancelada por el usuario');
+          return;
+        }
+        // Si hay otro error, continuar con método tradicional
+        console.warn('Error con File System API, usando método tradicional:', err);
+      }
+    }
+
+    // Método tradicional para navegadores que no soportan File System Access API
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = defaultFilename;
+    
+    // Método compatible para todos los navegadores
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    // Limpiar después de un tiempo
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 100);
+    
+    alert('Datos exportados correctamente');
+    
+  } catch (error) {
+    console.error('Error al exportar:', error);
+    alert('Error al exportar los datos');
+  }
+});
+
+document.getElementById('importJsonBtn').addEventListener('click', () => { 
+  document.getElementById('importFileInput').click(); 
+});
+
+document.getElementById('importFileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    try {
+      const importedEntries = JSON.parse(event.target.result);
+      if (Array.isArray(importedEntries)) {
+        const currentEntries = getStoredEntries();
+        
+        // Evitar duplicados por ID
+        const currentIds = currentEntries.map(e => e.id);
+        const uniqueImportedEntries = importedEntries.filter(e => !currentIds.includes(e.id));
+        
+        // Si hay duplicados, informar al usuario
+        if (uniqueImportedEntries.length < importedEntries.length) {
+          const duplicatesCount = importedEntries.length - uniqueImportedEntries.length;
+          alert(`${duplicatesCount} notas duplicadas fueron omitidas.`);
+        }
+        
+        const mergedEntries = [...currentEntries, ...uniqueImportedEntries];
+        setStoredEntries(mergedEntries);
+        refreshEntriesUI();
+        updateStats();
+        alert(`${uniqueImportedEntries.length} notas importadas correctamente`);
+      } else {
+        alert('El archivo no contiene un formato válido');
+      }
+    } catch (error) {
+      alert('Error al importar el archivo: ' + error.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = ''; // Reset input
+});
+
+/* NUEVAS FUNCIONALIDADES */
+
+// Actualizar estadísticas
+function updateStats() {
+  const entries = getStoredEntries();
+  const total = entries.length;
+  const completed = entries.filter(e => e.status === 'Completo').length;
+  const favorites = entries.filter(e => e.favorite).length;
+  const highPriority = entries.filter(e => e.priority === 'Alta').length;
+  const pending = entries.filter(e => e.status !== 'Completo').length;
+  const withReminder = entries.filter(e => e.reminder).length;
+  
+  // Contar recordatorios activos
+  const now = new Date().getTime();
+  const activeReminders = entries.filter(e => 
+    e.reminder && e.reminder <= now && !e.reminderNotified && e.status !== 'Completo'
+  ).length;
+  
+  // Contar categorías únicas
+  const categoriesCount = [...new Set(entries.map(e => e.category).filter(Boolean))].length;
+  
+  document.getElementById('totalNotes').textContent = total;
+  document.getElementById('completedNotes').textContent = completed;
+  document.getElementById('favoriteNotes').textContent = favorites;
+  document.getElementById('highPriorityNotes').textContent = highPriority;
+  document.getElementById('pendingNotes').textContent = pending;
+  document.getElementById('withReminderNotes').textContent = withReminder;
+  document.getElementById('activeReminders').textContent = activeReminders;
+  document.getElementById('categoriesCount').textContent = categoriesCount;
+}
+
+// Alternar favorito
+function toggleFavorite(id) {
+  const entries = getStoredEntries();
+  const entry = entries.find(e => e.id === id);
+  if (entry) {
+    entry.favorite = !entry.favorite;
+    setStoredEntries(entries);
+    refreshEntriesUI();
+    updateStats();
+  }
+}
+
+// Eliminar etiqueta
+function removeTag(id, tag) {
+  const entries = getStoredEntries();
+  const entry = entries.find(e => e.id === id);
+  if (entry && entry.tags) {
+    entry.tags = entry.tags.filter(t => t !== tag);
+    setStoredEntries(entries);
+    refreshEntriesUI();
+  }
+}
+
+// Navegación por pestañas
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Remover clase activa de todas las pestañas y contenidos
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    // Activar pestaña clickeada
+    tab.classList.add('active');
+    const tabId = tab.getAttribute('data-tab');
+    document.getElementById(`${tabId}-tab`).classList.add('active');
+    
+    // Actualizar estadísticas si se cambia a esa pestaña
+    if (tabId === 'stats') {
+      updateStats();
+    }
+    
+    // Actualizar opciones de categoría en búsqueda avanzada
+    if (tabId === 'search') {
+      updateAdvancedSearchCategories();
+    }
+  });
+});
+
+// Actualizar categorías en búsqueda avanzada
+function updateAdvancedSearchCategories() {
+  const entries = getStoredEntries();
+  const cats = [...new Set(entries.map(e => e.category).filter(Boolean))];
+  const categorySelect = document.getElementById('advancedSearchCategory');
+  
+  categorySelect.innerHTML = '<option value="">Cualquier categoría</option>';
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    categorySelect.appendChild(opt);
+  });
+}
+
+// Búsqueda avanzada
+document.getElementById('toggleAdvancedSearch').addEventListener('click', () => {
+  const advancedSearch = document.getElementById('advancedSearch');
+  advancedSearch.classList.toggle('hidden');
+});
+
+// Aplicar filtros avanzados
+document.getElementById('applyAdvancedFilters').addEventListener('click', () => {
+  const statusFilter = document.getElementById('statusFilter').value;
+  const priorityFilter = document.getElementById('priorityFilter').value;
+  const favoriteFilter = document.getElementById('favoriteFilter').value;
+  const dateFromFilter = document.getElementById('dateFromFilter').value;
+  const dateToFilter = document.getElementById('dateToFilter').value;
+  
+  let entries = getStoredEntries();
+  
+  // Aplicar filtros
+  if (statusFilter) {
+    entries = entries.filter(e => e.status === statusFilter);
+  }
+  
+  if (priorityFilter) {
+    entries = entries.filter(e => e.priority === priorityFilter);
+  }
+  
+  if (favoriteFilter === 'favorites') {
+    entries = entries.filter(e => e.favorite);
+  }
+  
+  if (dateFromFilter) {
+    const fromDate = new Date(dateFromFilter);
+    entries = entries.filter(e => new Date(e.date) >= fromDate);
+  }
+  
+  if (dateToFilter) {
+    const toDate = new Date(dateToFilter);
+    entries = entries.filter(e => new Date(e.date) <= toDate);
+  }
+  
+  // Mostrar resultados filtrados
+  displayFilteredResults(entries);
+});
+
+// Mostrar resultados filtrados
+function displayFilteredResults(entries) {
+  const container = document.getElementById('entries');
+  const completedContainer = document.getElementById('completedEntries');
+  
+  container.innerHTML = '';
+  completedContainer.innerHTML = '';
+  
+  // Separar completados y no completados
+  const activeEntries = entries.filter(e => e.status !== 'Completo');
+  const completedEntries = entries.filter(e => e.status === 'Completo');
+  
+  // Función de orden por prioridad
+  const priorityOrder = { 'Alta':1, 'Media':2, 'Baja':3, '':4 };
+  activeEntries.sort((a,b) => priorityOrder[a.priority||''] - priorityOrder[b.priority||'']);
+  completedEntries.sort((a,b) => priorityOrder[a.priority||''] - priorityOrder[b.priority||'']);
+  
+  // Asignar números correlativos por sección
+  activeEntries.forEach((e, idx) => { e.numero = idx+1; });
+  completedEntries.forEach((e, idx) => { e.numero = idx+1; });
+  
+  // Función para renderizar entradas
+  function renderEntries(list, containerTarget){
+    if (list.length === 0) {
+      containerTarget.innerHTML = '<p class="small">No se encontraron notas que coincidan con los filtros.</p>';
+      return;
+    }
+    
+    list.forEach(e => {
+      const div = document.createElement('div'); 
+      div.className = 'entry fade-in';
+      
+      // Añadir clases según prioridad y estado
+      if (e.priority === 'Alta') div.classList.add('priority-high');
+      else if (e.priority === 'Media') div.classList.add('priority-medium');
+      else if (e.priority === 'Baja') div.classList.add('priority-low');
+      
+      if (e.status === 'Completo') div.classList.add('status-complete');
+      else if (e.status === 'En curso') div.classList.add('status-in-progress');
+      else if (e.status === 'En pausa') div.classList.add('status-paused');
+      else if (e.status === 'Con incidencia') div.classList.add('status-issue');
+      
+      // Verificar si el recordatorio está activo
+      const now = new Date().getTime();
+      if (e.reminder && e.reminder <= now && !e.reminderNotified) {
+        div.classList.add('reminder-active');
+      }
+      
+      // Formatear fecha del recordatorio si existe
+      let reminderBadge = '';
+      if (e.reminder) {
+        const reminderDate = new Date(e.reminder);
+        const now = new Date();
+        if (reminderDate > now) {
+          reminderBadge = `<span class="reminder-badge">Recordatorio: ${reminderDate.toLocaleString()}</span>`;
+        } else if (!e.reminderNotified) {
+          reminderBadge = `<span class="reminder-badge" style="background:#f44336;color:white;">¡Recordatorio activo!</span>`;
+        }
+      }
+      
+      // Mostrar etiquetas si existen
+      let tagsHTML = '';
+      if (e.tags && e.tags.length > 0) {
+        tagsHTML = `<div class="tags-container">`;
+        e.tags.forEach(tag => {
+          tagsHTML += `<span class="tag">${tag}</span>`;
+        });
+        tagsHTML += `</div>`;
+      }
+      
+      div.innerHTML = `
+        <div>
+          <button class="favorite-btn ${e.favorite ? 'active' : ''}">★</button>
+          <strong>${e.numero}.</strong> ${e.text.replace(/\n/g,'<br>')} ${reminderBadge}
+        </div>
+        <div class="meta">
+          <span>${e.category}</span>
+          <span>${e.date}</span>
+        </div>
+        ${tagsHTML}
+        <div class="controls">
+          <select onchange="updatePriority('${e.id}', this.value)">
+            <option value="">Prioridad</option>
+            <option value="Alta" ${e.priority==='Alta'?'selected':''}>Alta</option>
+            <option value="Media" ${e.priority==='Media'?'selected':''}>Media</option>
+            <option value="Baja" ${e.priority==='Baja'?'selected':''}>Baja</option>
+          </select>
+          <select onchange="updateStatus('${e.id}', this.value)">
+            <option value="">Estatus</option>
+            <option value="No iniciado" ${e.status==='No iniciado'?'selected':''}>No iniciado</option>
+            <option value="En curso" ${e.status==='En curso'?'selected':''}>En curso</option>
+            <option value="En pausa" ${e.status==='En pausa'?'selected':''}>En pausa</option>
+            <option value="Con incidencia" ${e.status==='Con incidencia'?'selected':''}>Con incidencia</option>
+            <option value="Completo" ${e.status==='Completo'?'selected':''}>Completo</option>
+          </select>
+        </div>`;
+      
+      // Agregar evento de doble clic para abrir modal de edición
+      div.addEventListener('dblclick', () => {
+        openEditModal(e.id, e.text, e.category, e.tags, e.reminder, e.favorite);
+      });
+      
+      containerTarget.appendChild(div);
+    });
+  }
+
+  renderEntries(activeEntries, container);
+  renderEntries(completedEntries, completedContainer);
+  
+  // Ocultar secciones según corresponda
+  if(pendingHidden) container.classList.add('hidden');
+  else container.classList.remove('hidden');
+  
+  if(completedHidden) completedContainer.classList.add('hidden');
+  else completedContainer.classList.remove('hidden');
+}
+
+// Búsqueda avanzada en pestaña de búsqueda
+document.getElementById('performAdvancedSearch').addEventListener('click', () => {
+  const searchText = document.getElementById('advancedSearchText').value.toLowerCase();
+  const category = document.getElementById('advancedSearchCategory').value;
+  const status = document.getElementById('advancedSearchStatus').value;
+  const priority = document.getElementById('advancedSearchPriority').value;
+  const tagsInput = document.getElementById('advancedSearchTags').value.toLowerCase();
+  const dateFrom = document.getElementById('advancedSearchDateFrom').value;
+  const dateTo = document.getElementById('advancedSearchDateTo').value;
+  const favorite = document.getElementById('advancedSearchFavorite').value;
+  const hasReminder = document.getElementById('advancedSearchReminder').value;
+  
+  let entries = getStoredEntries();
+  
+  // Aplicar filtros
+  if (searchText) {
+    entries = entries.filter(e => 
+      e.text.toLowerCase().includes(searchText) || 
+      (e.category || '').toLowerCase().includes(searchText)
+    );
+  }
+  
+  if (category) {
+    entries = entries.filter(e => e.category === category);
+  }
+  
+  if (status) {
+    entries = entries.filter(e => e.status === status);
+  }
+  
+  if (priority) {
+    entries = entries.filter(e => e.priority === priority);
+  }
+  
+  if (tagsInput) {
+    const searchTags = tagsInput.split(',').map(tag => tag.trim());
+    entries = entries.filter(e => {
+      if (!e.tags || e.tags.length === 0) return false;
+      return searchTags.some(tag => e.tags.some(et => et.toLowerCase().includes(tag)));
+    });
+  }
+  
+  if (dateFrom) {
+    const fromDate = new Date(dateFrom);
+    entries = entries.filter(e => new Date(e.date) >= fromDate);
+  }
+  
+  if (dateTo) {
+    const toDate = new Date(dateTo);
+    entries = entries.filter(e => new Date(e.date) <= toDate);
+  }
+  
+  if (favorite === 'true') {
+    entries = entries.filter(e => e.favorite);
+  } else if (favorite === 'false') {
+    entries = entries.filter(e => !e.favorite);
+  }
+  
+  if (hasReminder === 'true') {
+    entries = entries.filter(e => e.reminder);
+  } else if (hasReminder === 'false') {
+    entries = entries.filter(e => !e.reminder);
+  }
+  
+  // Mostrar resultados en la pestaña de búsqueda
+  displayAdvancedSearchResults(entries);
+});
+
+// Limpiar filtros avanzados
+document.getElementById('clearAdvancedFilters').addEventListener('click', () => {
+  document.getElementById('advancedSearchText').value = '';
+  document.getElementById('advancedSearchCategory').value = '';
+  document.getElementById('advancedSearchStatus').value = '';
+  document.getElementById('advancedSearchPriority').value = '';
+  document.getElementById('advancedSearchTags').value = '';
+  document.getElementById('advancedSearchDateFrom').value = '';
+  document.getElementById('advancedSearchDateTo').value = '';
+  document.getElementById('advancedSearchFavorite').value = '';
+  document.getElementById('advancedSearchReminder').value = '';
+  
+  // Limpiar resultados
+  document.getElementById('advancedSearchResults').innerHTML = '';
+});
+
+// Mostrar resultados de búsqueda avanzada
+function displayAdvancedSearchResults(entries) {
+  const resultsContainer = document.getElementById('advancedSearchResults');
+  resultsContainer.innerHTML = '';
+  
+  if (entries.length === 0) {
+    resultsContainer.innerHTML = '<p class="small">No se encontraron notas que coincidan con los criterios de búsqueda.</p>';
+    return;
+  }
+  
+  // Ordenar por prioridad
+  const priorityOrder = { 'Alta':1, 'Media':2, 'Baja':3, '':4 };
+  entries.sort((a,b) => priorityOrder[a.priority||''] - priorityOrder[b.priority||'']);
+  
+  // Asignar números correlativos
+  entries.forEach((e, idx) => { e.numero = idx+1; });
+  
+  entries.forEach(e => {
+    const div = document.createElement('div'); 
+    div.className = 'entry fade-in';
+    
+    // Añadir clases según prioridad y estado
+    if (e.priority === 'Alta') div.classList.add('priority-high');
+    else if (e.priority === 'Media') div.classList.add('priority-medium');
+    else if (e.priority === 'Baja') div.classList.add('priority-low');
+    
+    if (e.status === 'Completo') div.classList.add('status-complete');
+    else if (e.status === 'En curso') div.classList.add('status-in-progress');
+    else if (e.status === 'En pausa') div.classList.add('status-paused');
+    else if (e.status === 'Con incidencia') div.classList.add('status-issue');
+    
+    // Verificar si el recordatorio está activo
+    const now = new Date().getTime();
+    if (e.reminder && e.reminder <= now && !e.reminderNotified) {
+      div.classList.add('reminder-active');
+    }
+    
+    // Formatear fecha del recordatorio si existe
+    let reminderBadge = '';
+    if (e.reminder) {
+      const reminderDate = new Date(e.reminder);
+      const now = new Date();
+      if (reminderDate > now) {
+        reminderBadge = `<span class="reminder-badge">Recordatorio: ${reminderDate.toLocaleString()}</span>`;
+      } else if (!e.reminderNotified) {
+        reminderBadge = `<span class="reminder-badge" style="background:#f44336;color:white;">¡Recordatorio activo!</span>`;
+      }
+    }
+    
+    // Mostrar etiquetas si existen
+    let tagsHTML = '';
+    if (e.tags && e.tags.length > 0) {
+      tagsHTML = `<div class="tags-container">`;
+      e.tags.forEach(tag => {
+        tagsHTML += `<span class="tag">${tag}</span>`;
+      });
+      tagsHTML += `</div>`;
+    }
+    
+    div.innerHTML = `
+      <div>
+        <button class="favorite-btn ${e.favorite ? 'active' : ''}">★</button>
+        <strong>${e.numero}.</strong> ${e.text.replace(/\n/g,'<br>')} ${reminderBadge}
+      </div>
+      <div class="meta">
+        <span>${e.category}</span>
+        <span>${e.date}</span>
+      </div>
+      ${tagsHTML}
+      <div class="controls">
+        <select onchange="updatePriority('${e.id}', this.value)">
+          <option value="">Prioridad</option>
+          <option value="Alta" ${e.priority==='Alta'?'selected':''}>Alta</option>
+          <option value="Media" ${e.priority==='Media'?'selected':''}>Media</option>
+          <option value="Baja" ${e.priority==='Baja'?'selected':''}>Baja</option>
+        </select>
+        <select onchange="updateStatus('${e.id}', this.value)">
+          <option value="">Estatus</option>
+          <option value="No iniciado" ${e.status==='No iniciado'?'selected':''}>No iniciado</option>
+          <option value="En curso" ${e.status==='En curso'?'selected':''}>En curso</option>
+          <option value="En pausa" ${e.status==='En pausa'?'selected':''}>En pausa</option>
+          <option value="Con incidencia" ${e.status==='Con incidencia'?'selected':''}>Con incidencia</option>
+          <option value="Completo" ${e.status==='Completo'?'selected':''}>Completo</option>
+        </select>
+      </div>`;
+    
+    // Agregar evento de doble clic para abrir modal de edición
+    div.addEventListener('dblclick', () => {
+      openEditModal(e.id, e.text, e.category, e.tags, e.reminder, e.favorite);
+    });
+    
+    resultsContainer.appendChild(div);
+  });
+}
+
+// Actualizar prioridad
+function updatePriority(id, priority) {
+  const entries = getStoredEntries();
+  const entry = entries.find(e => e.id === id);
+  if (entry) {
+    entry.priority = priority;
+    setStoredEntries(entries);
+    refreshEntriesUI();
+    updateStats();
+  }
+}
+
+// Actualizar estado
+function updateStatus(id, status) {
+  const entries = getStoredEntries();
+  const entry = entries.find(e => e.id === id);
+  if (entry) {
+    entry.status = status;
+    
+    // Si se marca como completo, quitar el recordatorio activo
+    if (status === 'Completo') {
+      entry.reminderNotified = true;
+    }
+    
+    setStoredEntries(entries);
+    refreshEntriesUI();
+    updateStats();
+  }
+}
+
+// Verificar recordatorios
+function checkReminders() {
+  const entries = getStoredEntries();
+  const now = new Date().getTime();
+  let hasActiveReminders = false;
+  
+  entries.forEach(entry => {
+    if (entry.reminder && entry.reminder <= now && !entry.reminderNotified && entry.status !== 'Completo') {
+      // Mostrar notificación
+      if (Notification.permission === 'granted') {
+        new Notification('Scriptum - Recordatorio', {
+          body: `${entry.text.substring(0, 50)}...`,
+          icon: 'https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20CSW.png'
+        });
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            new Notification('Scriptum - Recordatorio', {
+              body: `${entry.text.substring(0, 50)}...`,
+              icon: 'https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20CSW.png'
+            });
+          }
+        });
+      }
+      
+      // Marcar como notificado
+      entry.reminderNotified = true;
+      hasActiveReminders = true;
+    }
+  });
+  
+  if (hasActiveReminders) {
+    setStoredEntries(entries);
+    refreshEntriesUI(); // Actualizar la UI inmediatamente
+  }
+}
+
+// Verificar recordatorios cada minuto
+setInterval(checkReminders, 60000);
+
+// Solicitar permiso para notificaciones al cargar
+if ('Notification' in window) {
+  Notification.requestPermission();
+}
+
+// Inicializar estadísticas al cargar
+window.addEventListener('load', () => {
+  if (SESSION.unlocked) {
+    updateStats();
+  }
+});
+
+/* TOGGLE PENDING AND COMPLETED */
+document.getElementById('togglePendingBtn').addEventListener('click', () => {
+  pendingHidden = !pendingHidden;
+  document.getElementById('togglePendingBtn').textContent = pendingHidden ? 'Ver Pendientes' : 'Ocultar Pendientes';
+  refreshEntriesUI();
+});
+
+document.getElementById('toggleCompletedBtn').addEventListener('click', () => {
+  completedHidden = !completedHidden;
+  document.getElementById('toggleCompletedBtn').textContent = completedHidden ? 'Ver Completos' : 'Ocultar Completos';
+  refreshEntriesUI();
+});
+
+/* SELECT MODE */
+document.getElementById('selectBtn').addEventListener('click',()=>{
+  selecting=true;
+  selectedEntries=[];
+  document.getElementById('selectBtn').classList.add('hidden');
+  document.getElementById('cancelSelectBtn').classList.remove('hidden');
+  document.getElementById('selectAllBtn').classList.remove('hidden');
+  refreshEntriesUI();
+});
+
+document.getElementById('cancelSelectBtn').addEventListener('click',()=>{
+  selecting=false;
+  selectedEntries=[];
+  document.getElementById('selectBtn').classList.remove('hidden');
+  document.getElementById('cancelSelectBtn').classList.add('hidden');
+  document.getElementById('selectAllBtn').classList.add('hidden');
+  toggleShareButtons();
+  refreshEntriesUI();
+});
+
+document.getElementById('selectAllBtn').addEventListener('click',()=>{
+  const entries=getStoredEntries();
+  selectedEntries=entries.map(e=>e.id);
+  refreshEntriesUI();
+});
+
+function toggleShareButtons(){
+  const hasSelection=selectedEntries.length>0;
+  document.getElementById('shareWhatsBtn').classList.toggle('hidden',!hasSelection);
+  document.getElementById('shareEmailBtn').classList.toggle('hidden',!hasSelection);
+  document.getElementById('shareWordBtn').classList.toggle('hidden',!hasSelection);
+}
+
+/* SHARE */
+document.getElementById('shareWhatsBtn').addEventListener('click',()=>{
+  const entries=getStoredEntries().filter(e=>selectedEntries.includes(e.id));
+  let text='Mis notas:\n\n';
+  entries.forEach(e=>{
+    text+=`• ${e.text} (${e.category})\n`;
+  });
+  const url='https://api.whatsapp.com/send?text='+encodeURIComponent(text);
+  window.open(url,'_blank');
+});
+
+document.getElementById('shareEmailBtn').addEventListener('click',()=>{
+  const entries=getStoredEntries().filter(e=>selectedEntries.includes(e.id));
+  let text='Mis notas:\n\n';
+  entries.forEach(e=>{
+    text+=`• ${e.text} (${e.category})\n`;
+  });
+  const url='mailto:?subject=Mis notas&body='+encodeURIComponent(text);
+  window.open(url,'_blank');
+});
+
+document.getElementById('shareWordBtn').addEventListener('click',()=>{
+  const entries=getStoredEntries().filter(e=>selectedEntries.includes(e.id));
+  let htmlContent=`
+    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset='utf-8'><title>Mis notas</title></head><body>
+    <h1>Mis notas</h1>
+    <ul>
+  `;
+  entries.forEach(e=>{
+    htmlContent+=`<li>${e.text} (${e.category})</li>`;
+  });
+  htmlContent+='</ul></body></html>';
+  
+  const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(htmlContent);
+  const downloadLink = document.createElement('a');
+  downloadLink.href = source;
+  downloadLink.download = 'mis_notas.doc';
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+});
+</script>
+
+<div style="text-align:center; font-size:0.85rem; color:#555; position:fixed; bottom:10px; width:100%; z-index:101;">
+  By Pablo Ojeda
+</div>
+
+</body>
+</html>
