@@ -630,7 +630,7 @@ footer{
 <div id="loginView" style="text-align:center">
     <!-- Logo de Control Interno arriba-->
     <div style="text-align: center; margin-bottom: 15px;">
-        <img src="https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/LogoCI-BC.png" 
+        <img src="https://raw.githubusercontent.com/internalcontrolengineering/Desarrollos/main/LogoCI-BC.png" 
              alt="Logo Control Interno" 
              id="logoControlInternoLogin"
              style="max-width: 120px; height: auto;">
@@ -640,7 +640,7 @@ footer{
 
     <!-- Logo CSW debajo (se mantiene original) -->
     <div id="logoContainer">
-       <img src="https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20CSW.png" alt="Logo Scriptum" id="logo">
+       <img src="https://raw.githubusercontent.com/internalcontrolengineering/Desarrollos/main/Logo%20CSW.png" alt="Logo Scriptum" id="logo">
     </div>
 
     <div style="max-width:420px;margin:0 auto">
@@ -654,7 +654,7 @@ footer{
 <div id="diaryView" class="hidden">
     <!-- Logo de Control Interno arriba - DORADO EXCLUSIVO -->
     <div style="text-align: center; margin-bottom: 15px;">
-        <img src="https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/LogoCI-BC.png" 
+        <img src="https://raw.githubusercontent.com/internalcontrolengineering/Desarrollos/main/LogoCI-BC.png" 
              alt="Logo Control Interno" 
              id="logoControlInternoApp"
              style="max-width: 120px; height: auto;">
@@ -664,7 +664,7 @@ footer{
 
     <!-- Logo CSW debajo (se mantiene original) -->
     <div id="logoContainer">
-       <img src="https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20CSW.png" alt="Logo Scriptum" id="logo">
+       <img src="https://raw.githubusercontent.com/internalcontrolengineering/Desarrollos/main/Logo%20CSW.png" alt="Logo Scriptum" id="logo">
     </div>
 
     <!-- Contenido de pestañas -->
@@ -1972,14 +1972,14 @@ function checkReminders() {
       if (Notification.permission === 'granted') {
         new Notification('Scriptum - Recordatorio', {
           body: `${entry.text.substring(0, 50)}...`,
-          icon: 'https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20CSW.png'
+          icon: 'https://raw.githubusercontent.com/internalcontrolengineering/Desarrollos/main/Logo%20CSW.png'
         });
       } else if (Notification.permission !== 'denied') {
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
             new Notification('Scriptum - Recordatorio', {
               body: `${entry.text.substring(0, 50)}...`,
-              icon: 'https://raw.githubusercontent.com/jpojedawork-ai/Desarrollos/main/Logo%20CSW.png'
+              icon: 'https://raw.githubusercontent.com/internalcontrolengineering/Desarrollos/main/Logo%20CSW.png'
             });
           }
         });
